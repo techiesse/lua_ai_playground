@@ -1,0 +1,20 @@
+
+function colorFromInt(colorCode)
+    r = bit.rshift(bit.band(colorCode, 0xff0000), 16)
+    g = bit.rshift(bit.band(colorCode, 0x00ff00), 8)
+    b = bit.band(colorCode, 0x0000ff)
+    return {r, b, b}
+end
+
+
+COLOR =
+{
+    WHITE  = {0xff, 0xff, 0xff},
+    BLACK  = {0, 0, 0},
+    RED    = {0xff, 0x00, 0x00},
+    GREEN  = {0x00, 0xff, 0x00},
+    BLUE   = {0x00, 0x00, 0xff},
+    MAG    = {0xff, 0x00, 0xff},
+    CYAN   = {0x00, 0xff, 0xff},
+    YELLOW = {0x00, 0xff, 0x00},
+}
