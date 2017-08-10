@@ -1,0 +1,12 @@
+[Uso do mapa]
+* Ctrl + Click -> Criar um novo nó
+* Click (sobre um nó) -> Seleciona um nó
+* Click + Drag -> Move o nó de posição
+- RClick -> Desenha uma aresta se já houver nó selecionado
+- Delete -> Apaga o nó selecionado (e eventuais arestas ligadas a ele)
+- Remover aresta -> ?
+- Selecionar aresta -> ?
+
+[Menu]
+- Importar lista de adjacência
+- Exportar lista de adjacência

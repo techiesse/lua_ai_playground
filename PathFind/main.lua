@@ -1,4 +1,6 @@
 require"loveColor"
+require"loveHelpers"
+require"Graph"
 require"util"
 require"luno"
 luno.functional.exposeAll()
@@ -7,12 +9,8 @@ luno.useAliases()
 DEFAULT_RADIUS = 10
 
 --##############################################################################
-function rawDrawPoint(x, y, radius, isSelected)
-    isSelected = isSelected or false
-    love.graphics.circle("fill", x, y, radius)
-    if isSelected then
-        love.graphics.circle("line", x, y, radius + 2)
-    end
+function euclidianDistance(p1, p2)
+    return math.sqrt((p1[1]-p2[1])^2 + (p1[2]-p2[2])^2 )
 end
 
 
@@ -22,14 +20,9 @@ function drawPoint(p)
 end
 
 
-function euclidianDistance(p1, p2)
-    return math.sqrt((p1[1]-p2[1])^2 + (p1[2]-p2[2])^2 )
-end
-
-
 function getPointAt(x, y)
     local point = nil
-    for i, p in ipairs(points) do
+    for p in pairs(points) do
         if euclidianDistance(p, {x, y}) < p.r then
             point = p
             break
@@ -59,33 +52,36 @@ function clearSelections()
     selectedObjects = {}
 end
 
+
 --##############################################################################
 -- Callbacks
 
 function love.load()
-    points = {}
+    points = Graph()
     selectedObjects = {}
     width = love.graphics.getWidth()
     height = love.graphics.getHeight()
     love.graphics.setBackgroundColor(COLOR.WHITE)
     nodeNames = lstring.split("A B C D E F G H I J K L M N O P Q R S T U V W X Y Z", " ")
+    nameCount = 1
 end
 
 
 function love.draw()
     love.graphics.setColor(COLOR.BLACK)
 
-    if #points > 0 then
-        for i, point in ipairs(points) do
-            drawPoint(point)
+    for point, neighbors in pairs(points) do
+        drawPoint(point)
+        for neighbor in pairs(neighbors) do
+            love.graphics.line(point[1], point[2], neighbor[1], neighbor[2])
         end
     end
 
-    if love.mouse.isDown(2) and lastSelection ~= nil then
-        local mx = love.mouse.getX()
-        local my = love.mouse.getY()
-        love.graphics.line(lastSelection[1], lastSelection[2], mx, my)
-    end
+--    if love.mouse.isDown(2) and lastSelection ~= nil then
+--        local mx = love.mouse.getX()
+--        local my = love.mouse.getY()
+--        love.graphics.line(lastSelection[1], lastSelection[2], mx, my)
+--    end
 
 end
 
@@ -111,7 +107,8 @@ end
 function love.mousepressed(x, y, button)
     if button == 1 then -- primary
         if love.keyboard.isDown('lctrl', 'rctrl') then
-            table.insert(points,  Point(x, y, DEFAULT_RADIUS))
+            addNode(points,  Point(x, y, DEFAULT_RADIUS, nodeNames[nameCount]))
+            nameCount = nameCount + 1
         elseif love.keyboard.isDown('lshift', 'rshift') then
             lastSelection = selectPointAt(x, y)
             if lastSelection == nil then
@@ -122,15 +119,20 @@ function love.mousepressed(x, y, button)
             clearSelections()
             select(lastSelection)
         end
-
-
     elseif button == 2 then
+        if lastSelection ~= nil then
+            local p = getPointAt(x, y)
+            if p ~= lastSelection then
+                addNeighbor(points, lastSelection, p)
+            end
+        end
     end
 
 end
 
 
 function love.mousereleased(x, y, button)
+    --[[
     if button == 1 then -- primary
         if lastSelection ~= nil then
             local point = getPointAt(x, y)
@@ -140,5 +142,5 @@ function love.mousereleased(x, y, button)
         end
     elseif button == 2 then
     end
-
+    ]]
 end

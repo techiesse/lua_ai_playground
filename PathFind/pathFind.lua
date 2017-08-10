@@ -1,21 +1,15 @@
-require "Node"
+require "Graph"
 require "util"
 require "luno"
 luno.functional.exposeAll()
 
 
-function showPath(path)
-    local names = map(function (x) return x.name end, path)
-    return "Path: " .. table.concat(names, ", ")
-end
-
-
-function findPath(from, to, path, lookup)
+function findPath(g, from, to, path, lookup)
     lookup = lookup or {}
     lookup[from] = true
     path = path or {}
     local ok = false
-    for i, neighbor in ipairs(from.neighbors) do
+    for neighbor in pairs(g[from]) do
         if lookup[neighbor] == nil then
             if neighbor == to then
                 table.insert(path, from)
@@ -24,7 +18,7 @@ function findPath(from, to, path, lookup)
                 break
             else
                 local p
-                p, ok = findPath(neighbor, to, path, lookup)
+                p, ok = findPath(g, neighbor, to, path, lookup)
                 if ok then
                     table.insert(p, 1, from)
                     ok = true
@@ -38,32 +32,24 @@ function findPath(from, to, path, lookup)
     if not ok then
         lookup[from] = nil
     end
-    
+
     return path, ok
 end
 
-
-function pTable(tb)
-    for i, v in ipairs(tb) do
-        print(i, v)
-    end
+function printPath(path)
+    print(table.concat(map(tostring, p), " -> "))
 end
 
 
+g = Graph()
+addNode(g, "A")
+addNode(g, "A", "B", "C")
+addNode(g, "B", "D")
+addNode(g, "C", "D")
+addNode(g, "D", "E")
+addNode(g, "D", "F")
+addNode(g, "E", "F")
 
-a = Node("A")
-b = Node("B")
-c = Node("C")
-d = Node("D")
-e = Node("E")
-addNeighbor(a, b)
-addNeighbor(a, c)
-addNeighbor(b, d)
-addNeighbor(c, d)
-addNeighbor(d, e)
-addNeighbor(c, "F")
---print(showNode(a))
-
-p = findPath(a, e)
-map(print, (map(showNode, p)))
---pTable(p)
+p = findPath(g, "A", "F")
+--map(print, p)
+printPath(p)
